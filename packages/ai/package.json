@@ -1,0 +1,13 @@
+{
+  "name": "@synergy/ai",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Anthropic Claude wrapper — prompt registry, Upstash response cache, spend cap, injection filter, kill switch.",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "lint": "echo 'lint scaffold'",
+    "typecheck": "echo 'typecheck scaffold'",
+    "clean": "rm -rf dist .turbo"
+  }
+}

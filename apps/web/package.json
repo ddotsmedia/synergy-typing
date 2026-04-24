@@ -1,0 +1,13 @@
+{
+  "name": "@synergy/web",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Synergy Typing — customer-facing site (Next.js 15 App Router, bilingual EN/AR).",
+  "scripts": {
+    "dev": "echo 'dev scaffold — app code lands in Phase 1, Step 1'",
+    "build": "echo 'build scaffold — app code lands in Phase 1, Step 1'",
+    "lint": "echo 'lint scaffold'",
+    "typecheck": "echo 'typecheck scaffold'",
+    "clean": "rm -rf .next .turbo dist"
+  }
+}

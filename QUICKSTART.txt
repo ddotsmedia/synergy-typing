@@ -1,0 +1,71 @@
+SYNERGY TYPING SERVICES - QUICK START
+=====================================
+
+WHAT THIS IS
+------------
+Plan + Claude Code prompts for building a new website for Synergy
+Typing Services (Abu Dhabi). A modern, bilingual EN/AR platform with
+AI-powered service recommender, document checklist, OCR auto-fill,
+secure document uploads, fee calculator, application tracker, customer
+portal, payment processing, and an admin MVP.
+
+FILES IN THIS FOLDER
+--------------------
+  BUILD_PLAN.md          The 7-step build plan to feed Claude Code,
+                         one step at a time. READ THIS FIRST.
+  CLAUDE_CODE_PROMPT.md  The master prompt (Section 1 paste first).
+  SERVICES_CATALOGUE.md  44 services across 8 categories to seed the
+                         database (Claude Code references this in
+                         STEP 2).
+  assets/                Drop logo.png here before starting.
+  start.cmd              Double-click launcher (Windows).
+  start.ps1              PowerShell worker for the launcher.
+
+HOW TO START
+------------
+1. Drop your company logo at  assets/logo.png  (transparent PNG, ~800px).
+   If you don't have one yet, proceed without it - Claude Code will
+   generate a placeholder wordmark.
+
+2. Double-click  start.cmd
+   It opens VS Code, copies Section 1 of the prompt to your clipboard,
+   and tells you what to run next.
+
+3. In VS Code open a terminal (Ctrl + `) and run:
+       claude
+
+4. Paste (Ctrl+V) and press Enter. Claude Code will scaffold the
+   monorepo and produce README + docs. DO NOT let it start Phase 1 yet.
+
+5. Once scaffold is done, run /clear, then paste STEP 1 from
+   BUILD_PLAN.md. Review localhost. Continue step by step.
+
+BEFORE GOING LIVE - YOU NEED
+----------------------------
+- Company logo
+- Official phone + WhatsApp number
+- Branch address + Google Maps URL
+- Licence / registration number
+- Accurate services list (from the existing synergytyping.com)
+- Accurate fees for each service (TO VERIFY placeholders otherwise)
+- Accounts (all free tiers): GitHub, Vercel, Neon, Upstash, Inngest,
+  Resend, Stripe, Anthropic API, Cloudflare R2, PostHog
+- Production domain
+
+CREDIT DISCIPLINE
+-----------------
+- /clear between steps is the biggest single credit saver.
+- Use /model haiku for seed data and CRUD, only Sonnet/Opus for the
+  AI module and state machine.
+- Verify in both English and Arabic after each step.
+- If Claude Code drifts: "Stay on BUILD_PLAN.md. Revert anything
+  outside it."
+
+TROUBLESHOOTING
+---------------
+- "code is not recognized": VS Code not on PATH. Inside VS Code run
+  Command Palette -> "Shell Command: Install 'code' command in PATH".
+- "claude is not recognized": install with
+  npm install -g @anthropic-ai/claude-code
+- Windows SmartScreen may warn on start.cmd the first time. Click
+  "More info" -> "Run anyway".

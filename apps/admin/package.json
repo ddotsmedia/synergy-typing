@@ -1,0 +1,13 @@
+{
+  "name": "@synergy/admin",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Synergy Typing — staff/admin console (Next.js 15, auth-gated).",
+  "scripts": {
+    "dev": "echo 'dev scaffold — admin code lands in Phase 1, tail'",
+    "build": "echo 'build scaffold'",
+    "lint": "echo 'lint scaffold'",
+    "typecheck": "echo 'typecheck scaffold'",
+    "clean": "rm -rf .next .turbo dist"
+  }
+}

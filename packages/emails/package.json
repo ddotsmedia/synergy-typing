@@ -1,0 +1,13 @@
+{
+  "name": "@synergy/emails",
+  "version": "0.1.0",
+  "private": true,
+  "description": "React Email templates (bilingual EN/AR) rendered via Resend.",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "lint": "echo 'lint scaffold'",
+    "typecheck": "echo 'typecheck scaffold'",
+    "clean": "rm -rf dist .turbo"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "@synergy/api",
+  "version": "0.1.0",
+  "private": true,
+  "description": "tRPC routers + Zod schemas shared by web and admin.",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "lint": "echo 'lint scaffold'",
+    "typecheck": "echo 'typecheck scaffold'",
+    "clean": "rm -rf dist .turbo"
+  }
+}

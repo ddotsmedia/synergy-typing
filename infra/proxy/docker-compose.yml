@@ -1,0 +1,58 @@
+# Central Traefik reverse proxy — runs ONCE per VPS, shared by every site.
+# Auto-discovers services via Docker labels and auto-issues Let's Encrypt
+# certs. Sites attach by joining the external `web` network and declaring
+# `traefik.*` labels (see ../../docker-compose.yml at the repo root).
+#
+# First-time setup on the VPS:
+#   docker network create web                       # one-off
+#   cp infra/proxy/.env.example infra/proxy/.env    # set LETSENCRYPT_EMAIL
+#   docker compose -f infra/proxy/docker-compose.yml up -d
+#
+# Live on the dashboard at http://<vps-ip>:8080 (bound to localhost; tunnel
+# through SSH if you want to peek). Disabled by default — see ENABLE_DASHBOARD.
+
+services:
+  traefik:
+    image: traefik:v3.2
+    restart: unless-stopped
+    command:
+      - --log.level=INFO
+      - --accesslog=true
+      # ── Entrypoints ───────────────────────────────────────────────────
+      - --entrypoints.web.address=:80
+      - --entrypoints.web.http.redirections.entrypoint.to=websecure
+      - --entrypoints.web.http.redirections.entrypoint.scheme=https
+      - --entrypoints.web.http.redirections.entrypoint.permanent=true
+      - --entrypoints.websecure.address=:443
+      # ── Docker provider — auto-discovers labelled containers ──────────
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --providers.docker.network=web
+      # ── Let's Encrypt (TLS-ALPN-01 — needs port 443 reachable) ─────────
+      - --certificatesresolvers.le.acme.email=${LETSENCRYPT_EMAIL}
+      - --certificatesresolvers.le.acme.storage=/letsencrypt/acme.json
+      - --certificatesresolvers.le.acme.tlschallenge=true
+      # Optional staging CA while testing DNS — uncomment then re-deploy.
+      # - --certificatesresolvers.le.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik-letsencrypt:/letsencrypt
+    networks:
+      - web
+    labels:
+      # Ping endpoint — handy for uptime checks.
+      - traefik.enable=true
+      - traefik.http.routers.ping.rule=Host(`${PROXY_PING_HOST:-traefik.invalid}`)
+      - traefik.http.routers.ping.service=ping@internal
+      - traefik.http.routers.ping.entrypoints=websecure
+      - traefik.http.routers.ping.tls.certresolver=le
+
+networks:
+  web:
+    external: true
+
+volumes:
+  traefik-letsencrypt: # certs survive container recreate

@@ -1,11 +1,14 @@
-# Production stack for VPS deployment.
-# Customer site at https://${DOMAIN_WEB}, admin at https://${DOMAIN_ADMIN}.
-# Caddy auto-issues + renews TLS certificates from Let's Encrypt.
+# Synergy Typing — site stack.
+# Designed to live on a multi-site VPS behind a shared Traefik reverse proxy.
+# The proxy lives in `infra/proxy/` and runs once per VPS; this stack only
+# attaches to its `web` network and declares Traefik labels.
 #
-# Required env (set in .env on the VPS, see .env.example):
-#   DOMAIN_WEB    e.g. synergytyping.com
-#   DOMAIN_ADMIN  e.g. admin.synergytyping.com
-#   LETSENCRYPT_EMAIL  for cert issuance notifications
+# To deploy this site standalone (no other sites on the box) the proxy stack
+# in infra/proxy/ must also be running. See DEPLOY.md.
+#
+# Required env (in .env at this directory on the VPS, see .env.example):
+#   DOMAIN_WEB    e.g. milestonm.ae
+#   DOMAIN_ADMIN  e.g. admin.milestonm.ae
 
 services:
   web:
@@ -15,12 +18,26 @@ services:
       args: { APP: web }
     image: synergy-web:latest
     restart: unless-stopped
-    expose: ['3000']
     environment:
       NODE_ENV: production
       SYNERGY_STORE_DIR: /data
     volumes:
       - synergy-data:/data
+    networks: [web, internal]
+    expose: ['3000']
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=web
+      - traefik.http.routers.synergy-web.rule=Host(`${DOMAIN_WEB}`) || Host(`www.${DOMAIN_WEB}`)
+      - traefik.http.routers.synergy-web.entrypoints=websecure
+      - traefik.http.routers.synergy-web.tls=true
+      - traefik.http.routers.synergy-web.tls.certresolver=le
+      - traefik.http.services.synergy-web.loadbalancer.server.port=3000
+      # Redirect www → bare domain.
+      - traefik.http.middlewares.synergy-web-www.redirectregex.regex=^https://www\.(.*)
+      - traefik.http.middlewares.synergy-web-www.redirectregex.replacement=https://$$1
+      - traefik.http.middlewares.synergy-web-www.redirectregex.permanent=true
+      - traefik.http.routers.synergy-web.middlewares=synergy-web-www
     healthcheck:
       test: ['CMD', 'wget', '-qO-', 'http://127.0.0.1:3000/en']
       interval: 30s
@@ -35,12 +52,21 @@ services:
       args: { APP: admin }
     image: synergy-admin:latest
     restart: unless-stopped
-    expose: ['3000'] # internal port, Caddy maps from external 443
     environment:
       NODE_ENV: production
       SYNERGY_STORE_DIR: /data
     volumes:
       - synergy-data:/data
+    networks: [web, internal]
+    expose: ['3000']
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=web
+      - traefik.http.routers.synergy-admin.rule=Host(`${DOMAIN_ADMIN}`)
+      - traefik.http.routers.synergy-admin.entrypoints=websecure
+      - traefik.http.routers.synergy-admin.tls=true
+      - traefik.http.routers.synergy-admin.tls.certresolver=le
+      - traefik.http.services.synergy-admin.loadbalancer.server.port=3000
     healthcheck:
       test: ['CMD', 'wget', '-qO-', 'http://127.0.0.1:3000']
       interval: 30s
@@ -48,25 +74,11 @@ services:
       retries: 3
       start_period: 20s
 
-  caddy:
-    image: caddy:2-alpine
-    restart: unless-stopped
-    ports:
-      - '80:80'
-      - '443:443'
-    environment:
-      DOMAIN_WEB: ${DOMAIN_WEB}
-      DOMAIN_ADMIN: ${DOMAIN_ADMIN}
-      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
-    volumes:
-      - ./infra/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
-      - caddy-data:/data
-      - caddy-config:/config
-    depends_on:
-      - web
-      - admin
+networks:
+  web: # shared with Traefik — created by infra/proxy bootstrap
+    external: true
+  internal: # private to this site
+    driver: bridge
 
 volumes:
-  synergy-data: # JSON store — persists across restarts and rebuilds
-  caddy-data: # certificates + ACME state
-  caddy-config: # caddy auto-generated config
+  synergy-data: # JSON store survives rebuilds

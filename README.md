@@ -2,7 +2,7 @@
 
 > AI-powered platform for **Synergy Typing Services**, a licensed UAE typing centre in **Musaffah, Abu Dhabi**. Replaces [synergytyping.com](https://synergytyping.com/) with a bilingual (EN + AR) self-service portal for government e-services: immigration, labour, company formation, transport, real estate, attestation, medical, and more.
 
-[![CI](https://github.com/ddotsmediahosting-glitch/synergy-typing-services/actions/workflows/ci.yml/badge.svg)](https://github.com/ddotsmediahosting-glitch/synergy-typing-services/actions/workflows/ci.yml)
+[![CI](https://github.com/ddotsmedia/synergy-typing/actions/workflows/ci.yml/badge.svg)](https://github.com/ddotsmedia/synergy-typing/actions/workflows/ci.yml)
 
 ---
 
@@ -72,23 +72,23 @@ Full ERD, request flow, state machine, role matrix, and i18n strategy: [`docs/ar
 
 ## Stack rationale
 
-| Layer | Choice | Why |
-| --- | --- | --- |
-| Monorepo | pnpm + Turborepo | Shared packages (`ui`, `db`, `api`, `ai`), fast incremental builds, low overhead. |
-| App framework | Next.js 15 + React 19 | App Router + RSC → bilingual SSR for SEO, minimal client JS for Core Web Vitals. |
-| Styling | Tailwind + shadcn/ui | Token-driven design system; zero runtime; trivial RTL via logical properties. |
-| Animation | Framer Motion | Respects `prefers-reduced-motion`; accessible by default. |
-| i18n | next-intl | `/[locale]/...` routing with typed messages; plays cleanly with App Router. |
-| API | Route Handlers + tRPC + Zod | End-to-end typed contracts; Zod is the validation boundary everywhere. |
-| Jobs | Inngest | Durable state machine transitions, retries, scheduled purges — all on free tier. |
-| DB | Neon PostgreSQL + Prisma | Generous free tier, branching for previews, typed client. |
-| Auth | Auth.js v5 | Email magic link, Google, UAE Pass placeholder. Role-gated sessions. |
-| Storage | Cloudflare R2 | S3-compatible, zero egress, generous free tier. |
-| Payments | Stripe (+ adapters) | Cards / Apple Pay / Google Pay on day 1; Telr + Network International stubs for local UAE cards. |
-| Email | Resend + React Email | Bilingual templates authored in JSX. |
-| AI | Anthropic Claude via `@anthropic-ai/sdk` | Strong multilingual quality; wrapped in `packages/ai` with cache, spend cap, injection filter, kill switch. |
-| Observability | Sentry + PostHog | Error tracking + product analytics with EU region option. |
-| Hosting | Vercel + Neon + Upstash + Inngest | All generous free tiers; predictable cost scaling. |
+| Layer         | Choice                                   | Why                                                                                                         |
+| ------------- | ---------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| Monorepo      | pnpm + Turborepo                         | Shared packages (`ui`, `db`, `api`, `ai`), fast incremental builds, low overhead.                           |
+| App framework | Next.js 15 + React 19                    | App Router + RSC → bilingual SSR for SEO, minimal client JS for Core Web Vitals.                            |
+| Styling       | Tailwind + shadcn/ui                     | Token-driven design system; zero runtime; trivial RTL via logical properties.                               |
+| Animation     | Framer Motion                            | Respects `prefers-reduced-motion`; accessible by default.                                                   |
+| i18n          | next-intl                                | `/[locale]/...` routing with typed messages; plays cleanly with App Router.                                 |
+| API           | Route Handlers + tRPC + Zod              | End-to-end typed contracts; Zod is the validation boundary everywhere.                                      |
+| Jobs          | Inngest                                  | Durable state machine transitions, retries, scheduled purges — all on free tier.                            |
+| DB            | Neon PostgreSQL + Prisma                 | Generous free tier, branching for previews, typed client.                                                   |
+| Auth          | Auth.js v5                               | Email magic link, Google, UAE Pass placeholder. Role-gated sessions.                                        |
+| Storage       | Cloudflare R2                            | S3-compatible, zero egress, generous free tier.                                                             |
+| Payments      | Stripe (+ adapters)                      | Cards / Apple Pay / Google Pay on day 1; Telr + Network International stubs for local UAE cards.            |
+| Email         | Resend + React Email                     | Bilingual templates authored in JSX.                                                                        |
+| AI            | Anthropic Claude via `@anthropic-ai/sdk` | Strong multilingual quality; wrapped in `packages/ai` with cache, spend cap, injection filter, kill switch. |
+| Observability | Sentry + PostHog                         | Error tracking + product analytics with EU region option.                                                   |
+| Hosting       | Vercel + Neon + Upstash + Inngest        | All generous free tiers; predictable cost scaling.                                                          |
 
 ---
 
@@ -152,16 +152,16 @@ At Phase 0 the dev scripts are placeholders — they echo a reminder that app co
 
 Root scripts (run from repo root):
 
-| Script | Does |
-| --- | --- |
-| `pnpm dev` | Turbo dev for all apps/packages that declare `dev`. |
-| `pnpm build` | Turbo production build across the graph. |
-| `pnpm lint` | ESLint across all workspaces. |
-| `pnpm typecheck` | `tsc --noEmit` across all workspaces. |
-| `pnpm format` | Prettier write across the repo. |
-| `pnpm format:check` | Prettier check (CI uses this). |
-| `pnpm test` | Turbo test (only packages with business logic have tests). |
-| `pnpm clean` | Remove build artefacts + `node_modules`. |
+| Script              | Does                                                       |
+| ------------------- | ---------------------------------------------------------- |
+| `pnpm dev`          | Turbo dev for all apps/packages that declare `dev`.        |
+| `pnpm build`        | Turbo production build across the graph.                   |
+| `pnpm lint`         | ESLint across all workspaces.                              |
+| `pnpm typecheck`    | `tsc --noEmit` across all workspaces.                      |
+| `pnpm format`       | Prettier write across the repo.                            |
+| `pnpm format:check` | Prettier check (CI uses this).                             |
+| `pnpm test`         | Turbo test (only packages with business logic have tests). |
+| `pnpm clean`        | Remove build artefacts + `node_modules`.                   |
 
 Husky runs `lint-staged` on `pre-commit` (Prettier on staged files).
 
@@ -171,15 +171,15 @@ Husky runs `lint-staged` on `pre-commit` (Prettier on staged files).
 
 Source of truth: [`packages/config/tokens/brand.ts`](packages/config/tokens/brand.ts). Tailwind config and CSS variables consume these — do not hardcode colours elsewhere.
 
-| Token | Value | Use |
-| --- | --- | --- |
-| `--brand-primary` | `#0F1E4C` | Navy from the "SYNERGY" wordmark. Headings, nav, primary buttons. |
-| `--brand-secondary` | `#5DBCC9` | Teal from the logo mark. Links, accents, hover states. |
-| `--brand-accent` | `#C9A14A` | UAE gold. CTAs, trust badges, government-style highlights. |
-| `--ink` | `#0B1220` | Body text. |
-| `--surface` | `#F5F7FA` | Page surfaces, cards. |
-| `--muted` | `#6B7280` | Subtext (matches "TYPING SERVICES" gray). |
-| `--success` / `--warning` / `--danger` | `#1F8E5C` / `#D97706` / `#DC2626` | State colours. |
+| Token                                  | Value                             | Use                                                               |
+| -------------------------------------- | --------------------------------- | ----------------------------------------------------------------- |
+| `--brand-primary`                      | `#0F1E4C`                         | Navy from the "SYNERGY" wordmark. Headings, nav, primary buttons. |
+| `--brand-secondary`                    | `#5DBCC9`                         | Teal from the logo mark. Links, accents, hover states.            |
+| `--brand-accent`                       | `#C9A14A`                         | UAE gold. CTAs, trust badges, government-style highlights.        |
+| `--ink`                                | `#0B1220`                         | Body text.                                                        |
+| `--surface`                            | `#F5F7FA`                         | Page surfaces, cards.                                             |
+| `--muted`                              | `#6B7280`                         | Subtext (matches "TYPING SERVICES" gray).                         |
+| `--success` / `--warning` / `--danger` | `#1F8E5C` / `#D97706` / `#DC2626` | State colours.                                                    |
 
 **Typography:** Cairo (primary, supports AR + Latin) · Inter (Latin fallback), via `next/font`.
 

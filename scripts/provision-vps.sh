@@ -22,7 +22,7 @@
 #   BRANCH    default main
 set -euo pipefail
 
-REPO_URL="${REPO_URL:-https://github.com/ddotsmediahosting-glitch/synergy-typing-services.git}"
+REPO_URL="${REPO_URL:-https://github.com/ddotsmedia/synergy-typing.git}"
 APP_DIR="${APP_DIR:-/opt/synergy}"
 BRANCH="${BRANCH:-main}"
 

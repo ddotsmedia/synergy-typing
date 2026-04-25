@@ -45,7 +45,7 @@ firewall, clones the repo, and creates a `synergy` deploy user.
 
 ```bash
 ssh root@YOUR_VPS_IP
-curl -fsSL https://raw.githubusercontent.com/ddotsmediahosting-glitch/synergy-typing-services/main/scripts/provision-vps.sh | sudo bash
+curl -fsSL https://raw.githubusercontent.com/ddotsmedia/synergy-typing/main/scripts/provision-vps.sh | sudo bash
 ```
 
 When it finishes, edit `/opt/synergy/.env`:
@@ -87,7 +87,7 @@ ssh root@YOUR_VPS_IP \
 ```
 
 Add **3 secrets** to the GitHub repo
-(<https://github.com/ddotsmediahosting-glitch/synergy-typing-services/settings/secrets/actions>):
+(<https://github.com/ddotsmedia/synergy-typing/settings/secrets/actions>):
 
 | Secret        | Value                                                         |
 | ------------- | ------------------------------------------------------------- |
@@ -112,7 +112,7 @@ git push origin main
 ```
 
 Watch the run in real time:
-<https://github.com/ddotsmediahosting-glitch/synergy-typing-services/actions>
+<https://github.com/ddotsmedia/synergy-typing/actions>
 
 You can also trigger a deploy on demand from the **Actions** tab → **Deploy** →
 **Run workflow**.

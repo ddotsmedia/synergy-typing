@@ -1,9 +1,10 @@
-import { MessageCircle, Phone } from 'lucide-react';
-import { getTranslations } from 'next-intl/server';
+import { LogIn, MessageCircle, Phone, UserCircle2 } from 'lucide-react';
+import { getLocale, getTranslations } from 'next-intl/server';
 import { brand } from '@synergy/config/tokens/brand';
 import { Button } from '@synergy/ui/button';
 import { Link } from '@/i18n/routing';
 import { navLinks } from '@/lib/nav-links';
+import { getSession } from '@/lib/session';
 import { BrandLogoLockup } from './brand-logo';
 import { LanguageSwitcher } from './language-switcher';
 import { CommandTrigger } from './command-trigger';
@@ -13,6 +14,9 @@ export async function SiteHeader() {
   const tNav = await getTranslations('nav');
   const tHeader = await getTranslations('header');
   const tWa = await getTranslations('whatsapp');
+  const locale = await getLocale();
+  const session = await getSession();
+  const isAr = locale === 'ar';
   const waHref = `https://wa.me/${brand.contact.whatsappDigits}?text=${encodeURIComponent(
     'Hello Synergy',
   )}`;
@@ -60,6 +64,21 @@ export async function SiteHeader() {
           <div className="md:hidden">
             <LanguageSwitcher />
           </div>
+          {session ? (
+            <Button asChild variant="ghost" size="sm" className="hidden gap-2 sm:inline-flex">
+              <Link href="/account">
+                <UserCircle2 className="h-4 w-4" aria-hidden />
+                <span className="hidden md:inline">{isAr ? 'حسابي' : 'My account'}</span>
+              </Link>
+            </Button>
+          ) : (
+            <Button asChild variant="ghost" size="sm" className="hidden gap-2 sm:inline-flex">
+              <Link href="/sign-in">
+                <LogIn className="h-4 w-4" aria-hidden />
+                <span className="hidden md:inline">{isAr ? 'تسجيل الدخول' : 'Sign in'}</span>
+              </Link>
+            </Button>
+          )}
           <Button
             asChild
             variant="default"

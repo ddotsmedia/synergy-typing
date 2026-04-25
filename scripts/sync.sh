@@ -103,11 +103,18 @@ log "Changes to commit:"
 git status --short
 
 # ─── Commit message ──────────────────────────────────────────────────────────
+# If no message was passed, auto-generate one from the changed files +
+# timestamp so the script is fully zero-input. Pass a custom message any
+# time you want a more meaningful commit.
 if [[ -z "$MSG" ]]; then
-  if [[ -t 0 ]]; then
-    read -r -p "Commit message: " MSG
-  fi
-  [[ -n "$MSG" ]] || die "commit message required"
+  # Build a hint from up to 3 changed paths
+  hint=$(printf '%s\n' "${changed[@]}" \
+    | awk '{print $NF}' \
+    | xargs -n1 basename 2>/dev/null \
+    | head -3 | paste -sd, -)
+  ts=$(date '+%Y-%m-%d %H:%M')
+  MSG="chore: sync ${ts}${hint:+ — ${hint}}"
+  ok "auto commit message: $MSG"
 fi
 
 # ─── Stage / commit / push ───────────────────────────────────────────────────

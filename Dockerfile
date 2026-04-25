@@ -21,7 +21,13 @@ FROM node:20-alpine AS runner
 ARG APP
 ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1
 WORKDIR /app
-RUN addgroup -S nodejs -g 1001 && adduser -S nextjs -u 1001
+RUN addgroup -S nodejs -g 1001 && adduser -S nextjs -u 1001 \
+ && mkdir -p /data && chown nextjs:nodejs /data
+# /data is the runtime store directory (volume-mounted in production). Pre-
+# creating it as nextjs:nodejs means a fresh Docker volume inherits the right
+# ownership on first mount — otherwise the container hits EACCES trying to
+# write store.json on the first dynamic page request (services, calculator,
+# track).
 # Standalone bundle from Next.js — includes minimal node_modules + server.js
 COPY --from=builder --chown=nextjs:nodejs /repo/apps/${APP}/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /repo/apps/${APP}/.next/static ./apps/${APP}/.next/static

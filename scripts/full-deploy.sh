@@ -121,19 +121,70 @@ if systemctl is-active --quiet nginx 2>/dev/null; then
 
   if (( ${#LEGACY_HOSTS[@]} )); then
     log "Rewriting nginx to listen on 127.0.0.1:8080 (Traefik will take 80/443)"
-    # Replace external listens with localhost-only HTTP. Drop SSL listens
-    # entirely — Traefik terminates TLS for these hosts going forward.
-    for f in $(find /etc/nginx/sites-enabled /etc/nginx/conf.d \
-        -maxdepth 2 -type f \( -name '*.conf' -o ! -name '*.*' \) 2>/dev/null); do
-      sed -i \
-        -e 's/^\([[:space:]]*\)listen[[:space:]]\+\[::\]:443[^;]*;/\1# (disabled by full-deploy) &/' \
-        -e 's/^\([[:space:]]*\)listen[[:space:]]\+443[^;]*;/\1# (disabled by full-deploy) &/' \
-        -e 's/^\([[:space:]]*\)listen[[:space:]]\+\[::\]:80[^;]*;/\1listen 127.0.0.1:8080;/' \
-        -e 's/^\([[:space:]]*\)listen[[:space:]]\+80[^;]*;/\1listen 127.0.0.1:8080;/' \
+    # Use 'nginx -T' to enumerate every file nginx actually loads — handles
+    # symlinks (sites-enabled → sites-available) and arbitrary include paths.
+    mapfile -t nginx_files < <(
+      nginx -T 2>/dev/null \
+        | awk '/^# configuration file / { sub(":$", "", $4); print $4 }' \
+        | sort -u
+    )
+    edited=0
+    for f in "${nginx_files[@]}"; do
+      [[ -f "$f" && -w "$f" ]] || continue
+      # Skip the main nginx.conf — listen lines belong in vhosts; leaving its
+      # global directives untouched avoids breaking anything else.
+      [[ "$f" == /etc/nginx/nginx.conf ]] && continue
+      # Replace every public-facing listen with 127.0.0.1:8080 (HTTP only;
+      # Traefik will own TLS for these hosts going forward). Comment-out 443
+      # listens entirely so nginx no longer tries to bind them.
+      sed -i -E \
+        -e 's/^([[:space:]]*)listen[[:space:]]+(\[::\]:|0\.0\.0\.0:|\*:)?443([[:space:]][^;]*)?;/\1# (disabled by full-deploy) &/' \
+        -e 's/^([[:space:]]*)listen[[:space:]]+(\[::\]:|0\.0\.0\.0:|\*:)?80([[:space:]][^;]*)?;/\1listen 127.0.0.1:8080;/' \
         "$f"
+      edited=$((edited + 1))
     done
+    ok "Edited $edited nginx config files"
+
+    # Hard-verify: parse the live config after the edit and confirm no public
+    # 80/443 listen directives remain. The earlier 'nginx -t' only checks
+    # syntax, not semantics — it would have falsely reported success even
+    # when our regex missed the right files.
+    leftover=$(
+      nginx -T 2>/dev/null \
+        | awk '
+            /^[[:space:]]*#/      { next }
+            /^[[:space:]]*listen[[:space:]]/ {
+              line = $0
+              if (line ~ /127\.0\.0\.1/) next
+              if (line ~ /(:|^[[:space:]]*listen[[:space:]]+)(80|443)([[:space:]];]|$)/) print line
+            }' \
+        | sort -u
+    )
+    if [[ -n "$leftover" ]]; then
+      warn "nginx still has public 80/443 listen directives after the edit:"
+      echo "$leftover"
+      warn "These come from files I didn't touch — likely an unusual include"
+      warn "path. Restoring backup so you can fix manually."
+      rm -rf /etc/nginx
+      cp -a "$NGINX_BACKUP/etc-nginx" /etc/nginx
+      systemctl reload nginx || true
+      die "Backup restored at $NGINX_BACKUP. Inspect 'nginx -T | grep -B5 listen' to find the offending file."
+    fi
+
     if nginx -t 2>&1 | tail -2 | grep -q 'syntax is ok'; then
       systemctl reload nginx
+      # Triple-check via the kernel — what's actually bound to 80/443 now?
+      sleep 1
+      bound=$(ss -tnlp '( sport = :80 or sport = :443 )' 2>/dev/null | tail -n +2 || true)
+      if [[ -n "$bound" ]]; then
+        warn "Reload completed but 80/443 are still bound:"
+        echo "$bound"
+        warn "Restoring backup."
+        rm -rf /etc/nginx
+        cp -a "$NGINX_BACKUP/etc-nginx" /etc/nginx
+        systemctl reload nginx || true
+        die "Backup restored at $NGINX_BACKUP. Investigate above."
+      fi
       ok "Host nginx now listens on 127.0.0.1:8080 only"
     else
       warn "nginx -t failed after edits — restoring backup"

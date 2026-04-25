@@ -54,8 +54,19 @@ log "Sanity checks"
 source /etc/os-release 2>/dev/null || true
 [[ "${ID:-}" == "ubuntu" ]] || warn "OS '$ID' is not ubuntu — script tested on 22.04/24.04 only."
 free_kb=$(df --output=avail -k / | tail -n1)
-(( free_kb > 2_000_000 )) || die "Less than ~2 GB free on / — free up space and retry."
+# Note: bash arithmetic doesn't accept '_' as a digit separator (Python/JS only).
+(( free_kb > 2000000 )) || die "Less than ~2 GB free on / — free up space and retry."
 ok "OS=$ID $VERSION_ID; free disk: $((free_kb / 1024)) MB"
+
+# Tooling we rely on later (jq for healthcheck polling, dig for DNS sanity,
+# git for the repo clone). Pre-installing here so the script doesn't error
+# out later if Docker is already present and the per-step apt install was
+# skipped.
+log "Ensuring base tooling (jq dnsutils curl ca-certificates git ufw)"
+DEBIAN_FRONTEND=noninteractive apt-get update -y >/dev/null 2>&1 || true
+DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+  jq dnsutils curl ca-certificates git ufw >/dev/null 2>&1 \
+  || warn "apt couldn't install all tooling — continuing, may need manual fix later."
 
 # ─── 2. Inputs ───────────────────────────────────────────────────────────────
 prompt() {

@@ -32,12 +32,55 @@ You already have:
 - **VPS** `194.164.151.202` (Ubuntu, Hostinger)
 - **Domain** `milestonm.ae` (Hostinger DNS, nameservers configured)
 - **Repo** <https://github.com/ddotsmedia/synergy-typing> (synced)
+- **An existing site** on the VPS — host nginx serving `ddotsmediajobs.com`.
 
-You may also have:
+---
 
-- **An existing site** on the VPS — at least an nginx serving
-  `ddotsmediajobs.com` was responding when we probed it. **Decide what to do
-  with it before continuing** (see [Existing nginx](#1--existing-nginx-on-the-vps)).
+## TL;DR — one command does it all
+
+This is the recommended path. The script keeps `ddotsmediajobs.com` running
+and adds Synergy alongside it, both behind a shared Traefik reverse proxy
+with auto-SSL.
+
+```bash
+ssh root@194.164.151.202
+curl -fsSL https://raw.githubusercontent.com/ddotsmedia/synergy-typing/main/scripts/full-deploy.sh \
+  | DOMAIN_WEB=milestonm.ae \
+    DOMAIN_ADMIN=admin.milestonm.ae \
+    LETSENCRYPT_EMAIL=info@milestonm.ae \
+    sudo -E bash
+```
+
+What it does, step-by-step:
+
+1. Detects host nginx and the domains it serves.
+2. Backs up `/etc/nginx/` to `/root/nginx-backup-<timestamp>/`.
+3. Rewrites every nginx site to listen on `127.0.0.1:8080` only — Traefik
+   will own 80/443.
+4. Installs Docker, opens UFW for 22/80/443, creates the shared `web`
+   network.
+5. Clones this repo to `/opt/synergy/`, drops Traefik at `/opt/proxy/`.
+6. Generates a Traefik dynamic config that routes `ddotsmediajobs.com`
+   (and any other hosts nginx serves) through to the host nginx upstream.
+7. Builds and starts both stacks. Waits for healthchecks. Verifies DNS.
+
+Add the two A records in Hostinger DNS **before or after** running it —
+Traefik will issue Let's Encrypt certs automatically once DNS resolves:
+
+| Type | Name    | Value             |
+| ---- | ------- | ----------------- |
+| A    | `@`     | `194.164.151.202` |
+| A    | `admin` | `194.164.151.202` |
+
+`ddotsmediajobs.com`'s A record presumably already points here — leave it.
+
+The script is **idempotent**. Re-run it after every change (it'll just
+fast-forward git, regenerate `.env`, and re-up containers).
+
+---
+
+The rest of this document explains what the script does, in case you want
+to run the steps by hand or troubleshoot.
 
 ---
 

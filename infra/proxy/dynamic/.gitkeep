@@ -1,0 +1,3 @@
+# Dynamic Traefik config files live here.
+# scripts/full-deploy.sh writes legacy-nginx.yml here on first run when it
+# finds existing nginx vhosts to preserve.

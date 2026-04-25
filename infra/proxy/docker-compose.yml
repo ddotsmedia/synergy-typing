@@ -28,6 +28,9 @@ services:
       - --providers.docker=true
       - --providers.docker.exposedbydefault=false
       - --providers.docker.network=web
+      # ── File provider — routes for legacy host services (existing nginx) ─
+      - --providers.file.directory=/etc/traefik/dynamic
+      - --providers.file.watch=true
       # ── Let's Encrypt (TLS-ALPN-01 — needs port 443 reachable) ─────────
       - --certificatesresolvers.le.acme.email=${LETSENCRYPT_EMAIL}
       - --certificatesresolvers.le.acme.storage=/letsencrypt/acme.json
@@ -40,6 +43,10 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - traefik-letsencrypt:/letsencrypt
+      - ./dynamic:/etc/traefik/dynamic:ro
+    extra_hosts:
+      # Lets Traefik reach host-bound services (e.g. legacy nginx on 127.0.0.1:8080)
+      - host.docker.internal:host-gateway
     networks:
       - web
     labels:

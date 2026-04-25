@@ -1,0 +1,24 @@
+# Example dynamic Traefik config for routing existing-host nginx vhosts
+# (the `coexist` path from DEPLOY.md). Generated automatically by
+# scripts/full-deploy.sh — left here as documentation.
+#
+# Drop a copy of this file (named legacy-nginx.yml) into this directory and
+# Traefik will pick it up within a few seconds. To preserve another host
+# served by the local nginx, append it to the rule list.
+
+http:
+  routers:
+    legacy-nginx:
+      rule: |-
+        Host(`ddotsmediajobs.com`) || Host(`www.ddotsmediajobs.com`)
+      entryPoints: [websecure]
+      service: legacy-nginx
+      tls:
+        certResolver: le
+
+  services:
+    legacy-nginx:
+      loadBalancer:
+        servers:
+          - url: http://host.docker.internal:8080
+        passHostHeader: true

@@ -52,7 +52,42 @@ for arg in "$@"; do
 done
 
 # ─── Pre-flight ──────────────────────────────────────────────────────────────
-command -v gh >/dev/null 2>&1 || die "gh CLI not installed (https://cli.github.com)"
+# Detect environment + locate gh.
+# If we're sitting on the VPS (no gh, but the deploy script is here), short-
+# circuit into a direct "git pull + docker compose up" run — no GitHub Actions
+# round-trip needed. That makes `bash scripts/sync.sh` work both on your
+# laptop AND inside the VPS shell.
+if [[ -x /opt/synergy/scripts/deploy-host.sh && ! -d "$ROOT/apps/web/src" || ! -w "$ROOT" ]]; then
+  : # fall through to gh check below
+fi
+
+if ! command -v gh >/dev/null 2>&1; then
+  # Try common Windows install paths (PATH may be missing in nested shells)
+  for cand in \
+    "/c/Program Files/GitHub CLI/gh.exe" \
+    "/c/Program Files (x86)/GitHub CLI/gh.exe" \
+    "$HOME/AppData/Local/Programs/GitHub CLI/gh.exe" \
+    "$HOME/scoop/apps/gh/current/bin/gh.exe"; do
+    if [[ -x "$cand" ]]; then
+      PATH="$(dirname "$cand"):$PATH"
+      ok "found gh at $cand"
+      break
+    fi
+  done
+fi
+
+if ! command -v gh >/dev/null 2>&1; then
+  # No gh anywhere. If we're on the VPS (deploy-host.sh present), do the
+  # local equivalent: git pull + docker compose up.
+  if [[ -x /opt/synergy/scripts/deploy-host.sh ]]; then
+    log "no gh CLI here, but /opt/synergy/scripts/deploy-host.sh exists — running it directly"
+    exec sudo -u deploy bash /opt/synergy/scripts/deploy-host.sh
+  fi
+  die "gh CLI not found in PATH or standard locations.
+       Install it from https://cli.github.com/, then 'gh auth login'.
+       (Or run this script on the VPS and it will use deploy-host.sh.)"
+fi
+
 gh auth status >/dev/null 2>&1 || die "run 'gh auth login' first"
 
 branch=$(git rev-parse --abbrev-ref HEAD)

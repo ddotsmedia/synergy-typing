@@ -44,5 +44,11 @@ coverage/
 *.pfx
 *.key
 
+# local mutable demo store (admin app)
+.data/
+
+# production env file (never commit)
+.env
+
 # claude code local state
 .claude/

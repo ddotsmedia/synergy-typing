@@ -4,10 +4,31 @@
   "private": true,
   "description": "Synergy Typing — customer-facing site (Next.js 15 App Router, bilingual EN/AR).",
   "scripts": {
-    "dev": "echo 'dev scaffold — app code lands in Phase 1, Step 1'",
-    "build": "echo 'build scaffold — app code lands in Phase 1, Step 1'",
-    "lint": "echo 'lint scaffold'",
-    "typecheck": "echo 'typecheck scaffold'",
-    "clean": "rm -rf .next .turbo dist"
+    "dev": "next dev --port 3000",
+    "build": "next build",
+    "start": "next start --port 3000",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf .next .turbo"
+  },
+  "dependencies": {
+    "@synergy/config": "workspace:*",
+    "@synergy/db": "workspace:*",
+    "@synergy/ui": "workspace:*",
+    "lucide-react": "^0.469.0",
+    "next": "^15.1.0",
+    "next-intl": "^3.26.3",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.15",
+    "tailwindcss-animate": "^1.0.7",
+    "typescript": "^5.7.2"
   }
 }

@@ -1,0 +1,161 @@
+{
+  "metadata": {
+    "title": "Synergy Typing Services",
+    "description": "AI-powered platform for Synergy Typing Services — UAE government e-services in Abu Dhabi."
+  },
+  "nav": {
+    "services": "Services",
+    "feeCalculator": "Fee calculator",
+    "track": "Track application",
+    "assistant": "AI assistant",
+    "about": "About",
+    "contact": "Contact",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
+  },
+  "header": {
+    "whatsapp": "WhatsApp us",
+    "search": "Search services",
+    "searchShortcut": "Press ⌘K"
+  },
+  "languageSwitcher": {
+    "label": "Language",
+    "english": "English",
+    "arabic": "العربية"
+  },
+  "home": {
+    "eyebrow": "Licensed UAE typing centre · Abu Dhabi",
+    "title": "Government paperwork,",
+    "titleAccent": "without the queue.",
+    "subtitle": "Synergy Typing Services prepares, types, and submits your visa, labour, transport and attestation paperwork — bilingual, encrypted, and tracked end-to-end.",
+    "ctaPrimary": "Browse services",
+    "ctaSecondary": "Estimate my fees",
+    "search": {
+      "label": "What do you need today?",
+      "placeholder": "Try \"renew Emirates ID\" or \"family visa for spouse\"",
+      "cta": "Search"
+    },
+    "kpis": {
+      "yearsLabel": "Years serving Abu Dhabi",
+      "yearsValue": "12+",
+      "servicesLabel": "Government services",
+      "servicesValue": "40+",
+      "languagesLabel": "Languages spoken",
+      "languagesValue": "6"
+    },
+    "categories": {
+      "title": "Choose a category",
+      "subtitle": "We handle every paperwork journey at the front door of UAE government.",
+      "immigration": {
+        "title": "Immigration & Residency",
+        "description": "Visas, Emirates ID, status change."
+      },
+      "labour": { "title": "Labour (MOHRE)", "description": "Work permits, contracts, WPS." },
+      "company": { "title": "Company formation", "description": "Trade licences, PRO, renewals." },
+      "transport": { "title": "Transport", "description": "Driving licence, Mulkiya, plates." },
+      "realEstate": { "title": "Real estate", "description": "Tawtheeq, ADDC, completion certs." },
+      "attestation": { "title": "Attestation", "description": "MOFA, MOE, embassy, translation." },
+      "medical": { "title": "Medical & insurance", "description": "Fitness typing, health cover." },
+      "other": { "title": "Other e-services", "description": "Good conduct, VAT, Amer." }
+    },
+    "trust": {
+      "eyebrow": "Why customers stay with Synergy",
+      "items": {
+        "licensed": {
+          "title": "Government-licensed centre",
+          "body": "TAMM-affiliated, Musaffah-based since 2013. Real branch, real reviewers."
+        },
+        "bilingual": {
+          "title": "Fully bilingual workflow",
+          "body": "EN + AR end-to-end — forms, status updates, receipts, support."
+        },
+        "secure": {
+          "title": "Encrypted document vault",
+          "body": "Cloudflare R2 with signed URLs, 5-minute expiry, 90-day auto-purge."
+        },
+        "transparent": {
+          "title": "Honest fee breakdown",
+          "body": "Government fee, service fee and 5% VAT — separated, no surprises."
+        }
+      }
+    },
+    "checklistTitle": "Build status — STEP 1 shell",
+    "checklist": {
+      "i18n": "next-intl + RTL on /ar",
+      "tokens": "Brand tokens via @synergy/config Tailwind preset",
+      "ui": "shadcn/ui primitives in @synergy/ui",
+      "shell": "Header + footer + WhatsApp + ⌘K palette"
+    }
+  },
+  "footer": {
+    "tagline": "A licensed UAE typing centre helping residents and businesses navigate Abu Dhabi government e-services since 2013.",
+    "columns": {
+      "services": {
+        "title": "Services",
+        "links": {
+          "immigration": "Immigration & Residency",
+          "labour": "Labour (MOHRE)",
+          "company": "Company formation",
+          "transport": "Transport (ADP)"
+        }
+      },
+      "support": {
+        "title": "Support",
+        "links": {
+          "track": "Track application",
+          "appointment": "Book appointment",
+          "fees": "Fee calculator",
+          "faq": "FAQ"
+        }
+      },
+      "company": {
+        "title": "Company",
+        "links": {
+          "about": "About us",
+          "contact": "Contact",
+          "careers": "Careers",
+          "press": "Press"
+        }
+      },
+      "legal": {
+        "title": "Legal",
+        "links": {
+          "terms": "Terms of service",
+          "privacy": "Privacy policy",
+          "refund": "Refund policy",
+          "compliance": "Compliance"
+        }
+      }
+    },
+    "newsletter": {
+      "title": "Service updates",
+      "blurb": "Government fee changes, new e-services, holiday hours.",
+      "placeholder": "you@example.com",
+      "cta": "Subscribe"
+    },
+    "trust": {
+      "licence": "Licence no. TO VERIFY",
+      "trn": "TRN TO VERIFY",
+      "partners": "Affiliated portals"
+    },
+    "rights": "© {year} Synergy Typing Services. All rights reserved."
+  },
+  "whatsapp": {
+    "fab": "Chat on WhatsApp",
+    "prefill": "Hello Synergy, I'd like help with a UAE government service."
+  },
+  "command": {
+    "placeholder": "Search services, fees, FAQs...",
+    "empty": "No results yet — service catalogue lands in STEP 2.",
+    "groups": {
+      "services": "Services",
+      "actions": "Quick actions"
+    },
+    "actions": {
+      "fees": "Open fee calculator",
+      "track": "Track an application",
+      "assistant": "Ask the AI assistant",
+      "appointment": "Book an in-centre visit"
+    }
+  }
+}

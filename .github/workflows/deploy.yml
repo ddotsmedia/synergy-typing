@@ -36,15 +36,18 @@ jobs:
           VPS_HOST: ${{ secrets.VPS_HOST }}
           VPS_USER: ${{ secrets.VPS_USER }}
           APP_DIR: ${{ vars.APP_DIR || '/opt/synergy' }}
+          DEPLOY_SCRIPT: ${{ vars.DEPLOY_SCRIPT || 'scripts/deploy-host.sh' }}
         run: |
           ssh -i ~/.ssh/id_ed25519 -o BatchMode=yes "$VPS_USER@$VPS_HOST" \
-            "bash $APP_DIR/scripts/deploy.sh"
+            "bash $APP_DIR/$DEPLOY_SCRIPT"
 
       - name: Smoke check
         if: success()
         env:
           VPS_HOST: ${{ secrets.VPS_HOST }}
           VPS_USER: ${{ secrets.VPS_USER }}
+          APP_DIR: ${{ vars.APP_DIR || '/opt/synergy' }}
+          COMPOSE_FILE: ${{ vars.COMPOSE_FILE || 'docker-compose.host.yml' }}
         run: |
           ssh -i ~/.ssh/id_ed25519 -o BatchMode=yes "$VPS_USER@$VPS_HOST" \
-            "docker compose -f /opt/synergy/docker-compose.yml ps"
+            "docker compose -f $APP_DIR/$COMPOSE_FILE ps"

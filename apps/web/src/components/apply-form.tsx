@@ -1,7 +1,7 @@
 'use client';
 
 import { useActionState } from 'react';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, LogIn } from 'lucide-react';
 import { Button } from '@synergy/ui/button';
 import { Input } from '@synergy/ui/input';
 import { Link } from '@/i18n/routing';
@@ -36,11 +36,19 @@ export function ApplyForm({ slug, locale }: { slug: string; locale: string }) {
             </p>
             <div className="flex flex-wrap gap-2 pt-2">
               <Button asChild>
+                <Link
+                  href={`/sign-in?ref=${encodeURIComponent(state.reference)}&email=${encodeURIComponent(state.email)}`}
+                >
+                  <LogIn className="h-4 w-4" />
+                  {isAr ? 'الدخول إلى حسابي' : 'Sign in to my account'}
+                </Link>
+              </Button>
+              <Button asChild variant="outline">
                 <Link href={`/track?app=${state.reference}`}>
                   {isAr ? 'متابعة الطلب' : 'Track application'}
                 </Link>
               </Button>
-              <Button asChild variant="outline">
+              <Button asChild variant="ghost">
                 <Link href="/services">{isAr ? 'تصفّح خدمات أخرى' : 'Browse more services'}</Link>
               </Button>
             </div>

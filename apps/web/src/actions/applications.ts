@@ -8,7 +8,9 @@ function s(v: FormDataEntryValue | null): string {
   return typeof v === 'string' ? v.trim() : '';
 }
 
-export type SubmitResult = { ok: true; reference: string; locale: string } | { error: string };
+export type SubmitResult =
+  | { ok: true; reference: string; locale: string; email: string }
+  | { error: string };
 
 export async function submitApplicationAction(
   _prev: SubmitResult | null,
@@ -43,7 +45,7 @@ export async function submitApplicationAction(
   const app = store.createApplication({ customerId: customer.id, serviceId: service.id });
   revalidatePath('/track');
   revalidatePath(`/${locale}/track`);
-  return { ok: true, reference: app.reference, locale };
+  return { ok: true, reference: app.reference, locale, email };
 }
 
 export type TrackResult = { ok: true; appId: string } | { error: string } | null;

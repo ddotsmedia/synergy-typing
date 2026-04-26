@@ -6,8 +6,15 @@ import { SignInForm } from '@/components/sign-in-form';
 import { Link } from '@/i18n/routing';
 import { getSession } from '@/lib/session';
 
-export default async function SignInPage({ params }: { params: Promise<{ locale: string }> }) {
+export default async function SignInPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<{ ref?: string; email?: string }>;
+}) {
   const { locale } = await params;
+  const { ref, email } = await searchParams;
   setRequestLocale(locale);
   // Already signed in? Skip the form.
   const session = await getSession();
@@ -26,7 +33,7 @@ export default async function SignInPage({ params }: { params: Promise<{ locale:
         }
       />
       <section className="mx-auto grid max-w-5xl gap-10 px-6 py-12 lg:grid-cols-[1.4fr_1fr] lg:py-16">
-        <SignInForm locale={locale} />
+        <SignInForm locale={locale} defaultEmail={email} defaultReference={ref} />
         <aside className="border-subtle bg-surface space-y-4 rounded-2xl border p-6">
           <div className="bg-brand-secondary-soft text-brand-primary inline-flex h-10 w-10 items-center justify-center rounded-lg">
             <LogIn className="h-5 w-5" aria-hidden />

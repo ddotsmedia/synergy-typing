@@ -6,9 +6,18 @@ import { Button } from '@synergy/ui/button';
 import { Input } from '@synergy/ui/input';
 import { signInAction, type SignInResult } from '@/actions/auth';
 
-export function SignInForm({ locale }: { locale: string }) {
+export function SignInForm({
+  locale,
+  defaultEmail,
+  defaultReference,
+}: {
+  locale: string;
+  defaultEmail?: string;
+  defaultReference?: string;
+}) {
   const isAr = locale === 'ar';
   const [state, action, pending] = useActionState<SignInResult, FormData>(signInAction, null);
+  const prefilled = Boolean(defaultEmail || defaultReference);
 
   return (
     <form
@@ -16,6 +25,13 @@ export function SignInForm({ locale }: { locale: string }) {
       className="border-subtle space-y-5 rounded-2xl border bg-white p-6 lg:p-8"
     >
       <input type="hidden" name="locale" value={locale} />
+      {prefilled ? (
+        <p className="bg-brand-secondary-soft text-brand-primary rounded-md px-3 py-2 text-xs">
+          {isAr
+            ? 'تم ملء النموذج تلقائيًا — راجع التفاصيل ثم اضغط دخول.'
+            : 'Pre-filled from your application — review and click Sign in.'}
+        </p>
+      ) : null}
       <div className="space-y-1.5">
         <label
           htmlFor="email"
@@ -23,7 +39,14 @@ export function SignInForm({ locale }: { locale: string }) {
         >
           {isAr ? 'البريد الإلكتروني' : 'Email'}
         </label>
-        <Input id="email" name="email" type="email" required placeholder="you@example.com" />
+        <Input
+          id="email"
+          name="email"
+          type="email"
+          required
+          placeholder="you@example.com"
+          defaultValue={defaultEmail}
+        />
       </div>
       <div className="space-y-1.5">
         <label
@@ -32,7 +55,14 @@ export function SignInForm({ locale }: { locale: string }) {
         >
           {isAr ? 'رقم مرجعي لأي طلب' : 'Any application reference number'}
         </label>
-        <Input id="reference" name="reference" required placeholder="STS-2026-XXXX" />
+        <Input
+          id="reference"
+          name="reference"
+          required
+          placeholder="STS-2026-XXXX"
+          defaultValue={defaultReference}
+          autoFocus={prefilled}
+        />
         <p className="text-ink-subtle text-[11px]">
           {isAr
             ? 'تجد الرقم المرجعي في رسالة التأكيد التي وصلتك بعد التقديم.'

@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { Card, CardContent, CardHeader, CardTitle } from '@synergy/ui/card';
 import { PageHeader } from '@/components/page-header';
 import {

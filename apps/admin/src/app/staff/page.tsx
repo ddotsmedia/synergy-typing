@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { ShieldCheck } from 'lucide-react';
 import { Card, CardContent } from '@synergy/ui/card';
 import { Badge } from '@synergy/ui/badge';

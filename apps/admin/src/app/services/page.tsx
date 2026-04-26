@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { Card, CardContent } from '@synergy/ui/card';
 import { Input } from '@synergy/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@synergy/ui/table';

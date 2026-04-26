@@ -1,3 +1,7 @@
+// Read the store fresh on every request — server actions revalidate, but a
+// hard refresh / direct hit needs to bypass Next's static prerender cache.
+export const dynamic = 'force-dynamic';
+
 import { Archive, Mail, MailOpen, MessageCircle, Phone, Trash2 } from 'lucide-react';
 import { brand } from '@synergy/config/tokens/brand';
 import {

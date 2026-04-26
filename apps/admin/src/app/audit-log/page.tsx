@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { Download, Filter } from 'lucide-react';
 import { Button } from '@synergy/ui/button';
 import { Card, CardContent } from '@synergy/ui/card';

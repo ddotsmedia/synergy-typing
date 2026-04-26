@@ -7,10 +7,13 @@ import type {
   Customer,
   Faq,
   Integration,
+  Message,
   Service,
   Settings,
   Staff,
 } from './types';
+
+export const messages: Message[] = [];
 
 export const customers: Customer[] = [
   {

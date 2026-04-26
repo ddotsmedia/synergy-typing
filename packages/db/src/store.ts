@@ -14,6 +14,7 @@ import {
   customers as seedCustomers,
   faqs as seedFaqs,
   integrations as seedIntegrations,
+  messages as seedMessages,
   services as seedServices,
   settings as seedSettings,
   staff as seedStaff,
@@ -28,6 +29,9 @@ import type {
   Faq,
   Integration,
   Service,
+  Message,
+  MessageStatus,
+  MessageSubject,
   ServiceCategory,
   Settings,
   SocialLinks,
@@ -52,6 +56,7 @@ type Store = {
   auditLog: AuditEntry[];
   settings: Settings;
   integrations: Integration[];
+  messages: Message[];
 };
 
 function freshSeed(): Store {
@@ -66,6 +71,7 @@ function freshSeed(): Store {
       auditLog: seedAuditLog,
       settings: seedSettings,
       integrations: seedIntegrations,
+      messages: seedMessages,
     }),
   );
 }
@@ -129,6 +135,11 @@ function readStore(): Store {
         migrated = true;
       }
     }
+  }
+  // messages → backfill empty array on older store.json
+  if (!Array.isArray((parsed as Store & { messages?: Message[] }).messages)) {
+    parsed.messages = [];
+    migrated = true;
   }
   if (migrated) writeStore(parsed);
   return parsed;
@@ -676,7 +687,82 @@ export function createApplication(input: { customerId: string; serviceId: string
   return a;
 }
 
+// Messages (contact form submissions) ────────────────────────────────────
+
+export function listMessages(opts?: { status?: MessageStatus }): Message[] {
+  const all = readStore().messages ?? [];
+  return [...all]
+    .filter((m) => !opts?.status || m.status === opts.status)
+    .sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
+}
+
+export function getMessage(id: string): Message | undefined {
+  return (readStore().messages ?? []).find((m) => m.id === id);
+}
+
+export function unreadMessageCount(): number {
+  return (readStore().messages ?? []).filter((m) => m.status === 'unread').length;
+}
+
+export function createMessage(input: {
+  name: string;
+  email: string;
+  phone?: string;
+  subject?: MessageSubject;
+  body: string;
+  serviceId?: string;
+  source?: Message['source'];
+}): Message {
+  const s = readStore();
+  if (!s.messages) s.messages = [];
+  const m: Message = {
+    id: nextId('m', s.messages),
+    createdAt: new Date().toISOString(),
+    status: 'unread',
+    source: input.source ?? 'contact',
+    ...input,
+  };
+  s.messages.unshift(m);
+  pushAudit(s, {
+    actor: input.email,
+    action: 'message.received',
+    target: m.id,
+    meta: input.subject ?? 'general',
+  });
+  writeStore(s);
+  return m;
+}
+
+export function setMessageStatus(id: string, status: MessageStatus): void {
+  const s = readStore();
+  const m = (s.messages ?? []).find((x) => x.id === id);
+  if (!m) return;
+  m.status = status;
+  pushAudit(s, { actor: ACTOR, action: `message.${status}`, target: id });
+  writeStore(s);
+}
+
+export function deleteMessage(id: string): void {
+  const s = readStore();
+  if (!s.messages) return;
+  const m = s.messages.find((x) => x.id === id);
+  if (!m) return;
+  s.messages = s.messages.filter((x) => x.id !== id);
+  pushAudit(s, { actor: ACTOR, action: 'message.deleted', target: id, meta: m.email });
+  writeStore(s);
+}
+
 // Helpers exposed to UI ───────────────────────────────────────────────────
+
+export const MESSAGE_SUBJECT_LABEL: Record<MessageSubject, string> = {
+  general: 'General inquiry',
+  pricing: 'Pricing question',
+  service: 'Service availability',
+  application: 'Application status',
+  documents: 'Document help',
+  complaint: 'Complaint',
+  other: 'Other',
+};
 
 export const STATUS_LABEL: Record<ApplicationStatus, string> = {
   draft: 'Draft',

@@ -1,17 +1,25 @@
 'use client';
 
-import { navSections } from '@/lib/nav';
+import { getNavSections } from '@/lib/nav';
 import { SidebarNavLink } from './sidebar-nav-link';
 import { AdminLogo } from './brand-logo';
 
-export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
+export function Sidebar({
+  onNavigate,
+  badges = {},
+}: {
+  onNavigate?: () => void;
+  /** Plain-string badges keyed by route, e.g. { '/messages': '3' }. */
+  badges?: Record<string, string | undefined>;
+}) {
+  const nav = getNavSections(badges);
   return (
     <div className="flex h-full flex-col">
       <div className="border-subtle flex h-[72px] items-center border-b px-5">
         <AdminLogo />
       </div>
       <nav className="flex-1 space-y-7 overflow-y-auto px-3 py-6">
-        {navSections.map((section) => (
+        {nav.map((section) => (
           <div key={section.title}>
             <p className="text-ink-subtle px-3 pb-2 text-[10px] font-semibold uppercase tracking-[0.18em]">
               {section.title}

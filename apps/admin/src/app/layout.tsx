@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Cairo, Inter } from 'next/font/google';
+import { unreadMessageCount } from '@synergy/db';
 import { Sidebar } from '@/components/sidebar';
 import { Topbar } from '@/components/topbar';
 import './globals.css';
@@ -13,12 +14,21 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  // Build the nav with the live unread-message count badge.
+  let unread = 0;
+  try {
+    unread = unreadMessageCount();
+  } catch {
+    /* store may not exist at build time — fall back to 0 */
+  }
+  const badges = { '/messages': unread > 0 ? String(unread) : undefined };
+
   return (
     <html lang="en" className={`${cairo.variable} ${inter.variable}`}>
       <body className="bg-surface text-ink min-h-screen font-sans antialiased">
         <div className="flex min-h-screen">
           <aside className="border-subtle hidden w-64 shrink-0 border-e bg-white md:block">
-            <Sidebar />
+            <Sidebar badges={badges} />
           </aside>
           <div className="flex min-w-0 flex-1 flex-col">
             <Topbar />

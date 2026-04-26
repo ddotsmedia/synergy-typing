@@ -105,6 +105,34 @@ export type AuditEntry = {
   meta?: string;
 };
 
+export const MESSAGE_SUBJECTS = [
+  'general',
+  'pricing',
+  'service',
+  'application',
+  'documents',
+  'complaint',
+  'other',
+] as const;
+export type MessageSubject = (typeof MESSAGE_SUBJECTS)[number];
+
+export type MessageStatus = 'unread' | 'read' | 'archived';
+
+export type Message = {
+  id: string;
+  createdAt: string;
+  name: string;
+  email: string;
+  phone?: string;
+  subject?: MessageSubject;
+  body: string;
+  status: MessageStatus;
+  /** Optional service the customer was asking about. */
+  serviceId?: string;
+  /** Where the message originated (contact form, quote request, etc.). */
+  source: 'contact' | 'service-quote' | 'other';
+};
+
 export const SOCIAL_PLATFORMS = [
   'facebook',
   'instagram',

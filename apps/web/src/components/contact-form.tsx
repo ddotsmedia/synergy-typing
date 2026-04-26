@@ -4,8 +4,19 @@ import { useActionState } from 'react';
 import { CheckCircle2 } from 'lucide-react';
 import { Button } from '@synergy/ui/button';
 import { Input } from '@synergy/ui/input';
+import { Select } from '@synergy/ui/select';
 import { Textarea } from '@synergy/ui/textarea';
 import { contactSubmitAction, type LeadResult } from '@/actions/leads';
+
+const SUBJECT_OPTIONS = [
+  { value: 'general', en: 'General inquiry', ar: 'استفسار عام' },
+  { value: 'pricing', en: 'Pricing question', ar: 'استفسار عن الأسعار' },
+  { value: 'service', en: 'Service availability', ar: 'توفر الخدمة' },
+  { value: 'application', en: 'Application status', ar: 'حالة الطلب' },
+  { value: 'documents', en: 'Document help', ar: 'مساعدة في المستندات' },
+  { value: 'complaint', en: 'Complaint', ar: 'شكوى' },
+  { value: 'other', en: 'Other', ar: 'أخرى' },
+] as const;
 
 export function ContactForm({ locale }: { locale: string }) {
   const isAr = locale === 'ar';
@@ -39,8 +50,28 @@ export function ContactForm({ locale }: { locale: string }) {
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label={isAr ? 'الاسم' : 'Name'} name="name" required />
         <Field label={isAr ? 'البريد الإلكتروني' : 'Email'} name="email" type="email" required />
+        <Field
+          label={isAr ? 'رقم الهاتف' : 'Phone'}
+          name="phone"
+          type="tel"
+          placeholder="+971 50 …"
+        />
+        <div className="space-y-1.5">
+          <label
+            htmlFor="subject"
+            className="text-ink-subtle block text-xs font-semibold uppercase tracking-wider"
+          >
+            {isAr ? 'الموضوع' : 'Subject'}
+          </label>
+          <Select id="subject" name="subject" defaultValue="general">
+            {SUBJECT_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {isAr ? opt.ar : opt.en}
+              </option>
+            ))}
+          </Select>
+        </div>
       </div>
-      <Field label={isAr ? 'الموضوع' : 'Subject'} name="subject" />
       <div className="space-y-1.5">
         <label
           htmlFor="message"
@@ -57,7 +88,9 @@ export function ContactForm({ locale }: { locale: string }) {
         />
       </div>
       {state && 'error' in state ? (
-        <p className="text-danger text-sm font-medium">{state.error}</p>
+        <p className="text-danger bg-danger-soft rounded-md px-3 py-2 text-sm font-medium">
+          {state.error}
+        </p>
       ) : null}
       <Button type="submit" size="lg" disabled={pending} className="w-full sm:w-auto">
         {pending ? (isAr ? 'جارٍ الإرسال…' : 'Sending…') : isAr ? 'إرسال الرسالة' : 'Send message'}
